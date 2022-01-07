@@ -53,4 +53,15 @@ public class Thing {
     public char getGlyph() {
         return this.glyph;
     }
+    public void unmov()
+    {
+    }
+    public void canmov()
+    {
+        
+    }
+    public void setColor(Color c)
+    {
+        this.color=c;
+    }
 }

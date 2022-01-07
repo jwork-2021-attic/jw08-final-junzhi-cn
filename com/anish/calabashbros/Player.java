@@ -1,5 +1,6 @@
 package com.anish.calabashbros;
 import java.awt.Color;
+import java.math.*;
 
 public class Player extends Creature{
     private int xPos;
@@ -31,6 +32,53 @@ public class Player extends Creature{
         world.put(new Thing(Color.white, (char)(48+hp/10), this.world), 9, world.WIDTH-7);
         world.put(new Thing(Color.white, (char)(48+hp%10), this.world), 10, world.WIDTH-7);
         }
+    }
+    public Player(Color color, World world, int xPos, int yPos,int h) {
+        super(color, (char) 2, world);
+        this.xPos = xPos;
+        this.yPos = yPos;
+        lr=0;
+        ud=0;
+        hp=h;
+        lv=0;
+        att=1;
+        mov=1;
+        world.put(new Thing(Color.red, (char)181, this.world), 4, world.WIDTH-7);
+        world.put(new Thing(Color.white, (char)88, this.world), 6, world.WIDTH-7);
+        if (hp>=100){
+        world.put(new Thing(Color.white, (char)49, this.world), 8, world.WIDTH-7);
+        world.put(new Thing(Color.white, (char)79, this.world), 9, world.WIDTH-7);
+        world.put(new Thing(Color.white, (char)79, this.world), 10, world.WIDTH-7);
+        }
+        else
+        {
+        world.put(new Thing(Color.black, (char)49, this.world), 8, world.WIDTH-7);
+        world.put(new Thing(Color.white, (char)(48+hp/10), this.world), 9, world.WIDTH-7);
+        world.put(new Thing(Color.white, (char)(48+hp%10), this.world), 10, world.WIDTH-7);
+        }
+    }
+    public void setPro(int h,int l,int a,int m)
+    {
+        hp=h;
+        mov=m;
+        lv=l;
+        att=a;
+    }
+    public void setHp(int h)
+    {
+        hp=h;
+    }
+    public void setMov(int m)
+    {
+        mov=m;
+    }
+    public void setAtt(int m)
+    {
+        att=m;
+    }
+    public void setLv(int m)
+    {
+        lv=m;
     }
     @Override
     public boolean isPlayer()
@@ -133,7 +181,7 @@ public class Player extends Creature{
     @Override
     public void getHurt(int num)
     {
-        this.hp-=num*this.world.getDamage();
+        this.hp=Math.max(hp-num*this.world.getDamage(),0);
         if (isDead())
         {
             world.end();
@@ -144,7 +192,10 @@ public class Player extends Creature{
         world.put(new Thing(Color.white, (char)49, this.world), 8, world.WIDTH-7);
         else
         world.put(new Thing(Color.black, (char)49, this.world), 8, world.WIDTH-7);
-        world.put(new Thing(Color.white, (char)(48+hp/10), this.world), 9, world.WIDTH-7);
+        if (hp<100)
+        world.put(new Thing(Color.white, (char)(48+hp/10), world), 9, world.WIDTH-7);
+        else
+        world.put(new Thing(Color.white, (char)(48), world), 9, world.WIDTH-7);
         world.put(new Thing(Color.white, (char)(48+hp%10), this.world), 10, world.WIDTH-7);
     }
     public int getAtt()
@@ -164,47 +215,95 @@ public class Player extends Creature{
         d=this.world.get(this.getxPos(), this.getyPos()-1);
         l=this.world.get(this.getxPos()-1, this.getyPos());
         r=this.world.get(this.getxPos()+1, this.getyPos());
-        world.put(new Thing(color.yellow, (char)241, this.world), this.getxPos()+1, this.getyPos());
-        world.put(new Thing(color.yellow, (char)241, this.world), this.getxPos()-1, this.getyPos());
-        world.put(new Thing(color.yellow, (char)241, this.world), this.getxPos(), this.getyPos()+1);
-        world.put(new Thing(color.yellow, (char)241, this.world), this.getxPos(), this.getyPos()-1);
+        Color cu,cd,cl,cr;
+        cu=u.getColor();
+        cd=d.getColor();
+        cl=l.getColor();
+        cr=r.getColor();
         if(u instanceof Monster)
         {
             u.getHurt(25*att);
             if(u.isDead())
-            u=new Wall(world);
+            world.put(new Wall(world), u.getX(), u.getY());
+            else
+            u.setColor(Color.red);
+        }
+        else 
+        {
+        world.put(new Thing(Color.yellow, (char)241, this.world), this.getxPos(), this.getyPos()+1);
         }
         if(d instanceof Monster)
         {
             d.getHurt(25*att);
             if(d.isDead())
-            d=new Wall(world);
+            world.put(new Wall(world), d.getX(), d.getY());
+            else
+            d.setColor(Color.red);
+        }
+        else
+        {
+        world.put(new Thing(Color.yellow, (char)241, this.world), this.getxPos(), this.getyPos()-1);
         }
         if(l instanceof Monster)
         {
             l.getHurt(25*att);
             if(l.isDead())
-            l=new Wall(world);
+            world.put(new Wall(world), l.getX(), l.getY());
+            else
+            l.setColor(Color.red);
+        }
+        else
+        {
+        world.put(new Thing(Color.yellow, (char)241, this.world), this.getxPos()-1, this.getyPos());
         }
         if(r instanceof Monster)
         {
             r.getHurt(25*att);
             if(r.isDead())
-            r=new Wall(world);
+            world.put(new Wall(world), r.getX(), r.getY());
+            else
+            r.setColor(Color.red);
+        }
+        else
+        {
+        world.put(new Thing(Color.yellow, (char)241, this.world), this.getxPos()+1, this.getyPos());
         }
         try { 
             Thread.sleep(200);
         } catch (Exception e) { 
             System.out.println("err"); 
         }
-        this.world.put(u,this.getxPos(), this.getyPos()+1);
-        this.world.put(d,this.getxPos(), this.getyPos()-1);
-        this.world.put(l,this.getxPos()-1, this.getyPos());
-        this.world.put(r,this.getxPos()+1, this.getyPos());
-        try { 
-            Thread.sleep(1);
-        } catch (Exception e) { 
-            System.out.println("err"); 
+        if(world.isAlive() && world.isBeg())
+        {
+            if(!(u instanceof Monster))this.world.put(u,this.getxPos(), this.getyPos()+1);
+            else u.setColor(cu);
+            if(!(d instanceof Monster))this.world.put(d,this.getxPos(), this.getyPos()-1);
+            else d.setColor(cd);
+            if(!(l instanceof Monster))this.world.put(l,this.getxPos()-1, this.getyPos());
+            else l.setColor(cl);
+            if(!(r instanceof Monster))this.world.put(r,this.getxPos()+1, this.getyPos());
+            else r.setColor(cr);
+            try { 
+                Thread.sleep(2);
+            } catch (Exception e) { 
+                System.out.println("err"); 
+            }
         }
+    }
+    public int getHp()
+    {
+        return hp;
+    }
+    public int getRealMov()
+    {
+        return mov;
+    }
+    public int getLv()
+    {
+        return lv;
+    }
+    public void setShape(char g)
+    {
+        this.glyph=g;
     }
 }

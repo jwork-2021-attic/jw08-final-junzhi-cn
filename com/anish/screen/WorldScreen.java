@@ -3,6 +3,8 @@ package com.anish.screen;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import com.anish.calabashbros.*;
+import com.anish.file.MyFile;
+import com.anish.*;
 
 import my.runo.*;
 
@@ -10,12 +12,16 @@ import asciiPanel.AsciiPanel;
 
 import java.util.Random;
 
+import java.io.*;
+
 public class WorldScreen implements Screen {
 
     private World world;
     protected Player player;
     private int[][] map;
+    private Thread autoput;
     public static final int LEN = 20;
+    private MyFile file=new MyFile();
 
     public WorldScreen() {
         world = new World();
@@ -26,6 +32,17 @@ public class WorldScreen implements Screen {
         // thing=new Thing(Color.WHITE, (char) i, world);
         // world.put(thing, i%16, i/16);
         // }
+        world.beg();
+    }
+    private void start()
+    {
+        world.newWorld();
+        try { 
+            Thread.sleep(300);
+        } catch (Exception e) { 
+            System.out.println("err"); 
+        }
+        world.go();
         Random r = new Random();
         for(int i=0;i<=LEN;i++)
         {
@@ -92,14 +109,31 @@ public class WorldScreen implements Screen {
         py=r.nextInt(LEN-1)+1;}
         while(map[px][py]==2||map[px][py]==1);
         player = new Player(Color.WHITE, world, px, py);
+        world.setPlayer(player);
         world.put(player, px, py);
         
 
-        Thread autoput =new Thread(new AutoPut(world));
+        autoput =new Thread(new AutoPut(world,file));
         autoput.start();
 
     }
+    private void load()
+    {
+        world.newWorld();
+        try { 
+            Thread.sleep(300);
+        } catch (Exception e) { 
+            System.out.println("err"); 
+        }
+        world.go();
+        MyFile file;
+        file=new MyFile();
+        file.in(world);
 
+        autoput =new Thread(new AutoPut(world,file));
+        autoput.start();
+
+    }
     
     private boolean isOK(int xPos, int yPos){
         if(xPos >= 0 && xPos < LEN && yPos >= 0 && yPos < LEN && world.get(xPos,yPos).getGlyph()!=(char) 177 &&!world.get(xPos,yPos).isPlayer() && !world.get(xPos,yPos).isMon() ){
@@ -127,87 +161,126 @@ public class WorldScreen implements Screen {
     int i = 0;
 
     @Override
-    public synchronized Screen respondToUserInput(KeyEvent key) {
-        int xPos = player.getxPos();
-        int yPos = player.getyPos();
+    public synchronized Screen respondToUserInput(KeyEvent key) 
+    {
         if(world.isAlive())
-        switch(key.getKeyCode()){
-            case 69://E
-                Thread att =new Thread(new PlayerAtt(player));
-                att.start();
-                break;
-            case 81://Q
-                player.changes();
-                break;
-            case 0x20://space
-                if(player.getDir()==1)
-                {
-                    if(isOK(xPos, yPos - player.getMov())){
-                        player.moveTo(xPos, yPos - player.getMov());
-                        player.setxPos(xPos);
-                        player.setyPos(yPos - player.getMov());
+        {
+            int xPos = player.getxPos();
+            int yPos = player.getyPos();
+            switch(key.getKeyCode())
+            {
+                case 69://E
+                    Thread att =new Thread(new PlayerAtt(player));
+                    att.start();
+                    break;
+                case 81://Q
+                    player.changes();
+                    break;
+                case 0x20://space
+                    if(player.getDir()==1)
+                    {
+                        if(isOK(xPos, yPos - player.getMov())){
+                            player.moveTo(xPos, yPos - player.getMov());
+                            player.setxPos(xPos);
+                            player.setyPos(yPos - player.getMov());
+                        }
                     }
-                }
-                else if(player.getDir()==2)
-                {
-                    if(isOK(xPos, yPos + player.getMov())){
-                        player.moveTo(xPos, yPos + player.getMov());
-                        player.setxPos(xPos);
-                        player.setyPos(yPos + player.getMov());
+                    else if(player.getDir()==2)
+                    {
+                        if(isOK(xPos, yPos + player.getMov())){
+                            player.moveTo(xPos, yPos + player.getMov());
+                            player.setxPos(xPos);
+                            player.setyPos(yPos + player.getMov());
+                        }
                     }
-                }
-                else if(player.getDir()==3)
-                {
-                    if(isOK(xPos - player.getMov(), yPos)){
-                        player.moveTo(xPos - player.getMov(), yPos);
-                        player.setxPos(xPos - player.getMov());
+                    else if(player.getDir()==3)
+                    {
+                        if(isOK(xPos - player.getMov(), yPos)){
+                            player.moveTo(xPos - player.getMov(), yPos);
+                            player.setxPos(xPos - player.getMov());
+                            player.setyPos(yPos);
+                        }
+                    }
+                    else if(player.getDir()==4)
+                    {
+                        if(isOK(xPos + player.getMov(), yPos)){
+                            player.moveTo(xPos + player.getMov(), yPos);
+                            player.setxPos(xPos + player.getMov());
+                            player.setyPos(yPos);
+                        }
+                    }
+                    break;
+                case 0x25://←
+                        player.setlr(-1);
+                    if(isOK(xPos - 1, yPos)){
+                        player.moveTo(xPos - 1, yPos);
+                        player.setxPos(xPos - 1);
                         player.setyPos(yPos);
                     }
-                }
-                else if(player.getDir()==4)
-                {
-                    if(isOK(xPos + player.getMov(), yPos)){
-                        player.moveTo(xPos + player.getMov(), yPos);
-                        player.setxPos(xPos + player.getMov());
+                    break;
+                case 0x26://↑
+                        player.setud(1);
+                    if(isOK(xPos, yPos - 1)){
+                        player.moveTo(xPos, yPos - 1);
+                        player.setxPos(xPos);
+                        player.setyPos(yPos - 1);
+                    }
+                    break;
+                case 0x27://→
+                        player.setlr(1);
+                    if(isOK(xPos + 1, yPos)){
+                        player.moveTo(xPos + 1, yPos);
+                        player.setxPos(xPos + 1);
                         player.setyPos(yPos);
                     }
-                }
-                break;
+                    break;
+                case 0x28://↓
+                        player.setud(-1);
+                    if(isOK(xPos, yPos + 1)){
+                        player.moveTo(xPos, yPos + 1);
+                        player.setxPos(xPos);
+                        player.setyPos(yPos + 1);
+                    }
+                    break;
+                case KeyEvent.VK_ESCAPE:
+                        world.newWorld();
+                        file.out(world);
+                        world.beg();
+                default:
+                    break;
+
+            }
+            if(world.isAlive())
+            file.out(world);
+        }
+
+    
+        else if(world.isBeg())
+        {
+            switch(key.getKeyCode()){
             case 0x25://←
-                    player.setlr(-1);
-                if(isOK(xPos - 1, yPos)){
-                    player.moveTo(xPos - 1, yPos);
-                    player.setxPos(xPos - 1);
-                    player.setyPos(yPos);
-                }
+                world.begKey();
                 break;
             case 0x26://↑
-                    player.setud(1);
-                if(isOK(xPos, yPos - 1)){
-                    player.moveTo(xPos, yPos - 1);
-                    player.setxPos(xPos);
-                    player.setyPos(yPos - 1);
-                }
+                world.begKey();
                 break;
             case 0x27://→
-                    player.setlr(1);
-                if(isOK(xPos + 1, yPos)){
-                    player.moveTo(xPos + 1, yPos);
-                    player.setxPos(xPos + 1);
-                    player.setyPos(yPos);
-                }
+                world.begKey();
                 break;
             case 0x28://↓
-                    player.setud(-1);
-                if(isOK(xPos, yPos + 1)){
-                    player.moveTo(xPos, yPos + 1);
-                    player.setxPos(xPos);
-                    player.setyPos(yPos + 1);
-                }
+                world.begKey();
+                break;
+            case KeyEvent.VK_ENTER://enter
+                if(world.isNew()) start();
+                else load();
+                break;
+            case 0x20://space
+                if(world.isNew()) start();
+                else load();
                 break;
             default:
-                break;
-                
+                break;  
+            }
         }
         try { 
             Thread.sleep(100);

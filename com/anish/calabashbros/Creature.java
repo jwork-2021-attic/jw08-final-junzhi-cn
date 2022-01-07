@@ -8,6 +8,7 @@ public class Creature extends Thing {
     protected int lv;
     Creature(Color color, char glyph, World world) {
         super(color, glyph, world);
+        pre=new Floor(world);
     }
     public void moveTo(int xPos, int yPos) {
         int px=this.getX();

@@ -4,25 +4,28 @@ import java.util.Random;
 import com.anish.calabashbros.Shield;
 import com.anish.calabashbros.Sword;
 import com.anish.calabashbros.World;
+import com.anish.file.MyFile;
 
 public class AutoPut implements Runnable {
     World world;
     Random r;
-    public AutoPut(World w) 
+    MyFile file;
+    public AutoPut(World w,MyFile f) 
     {
         world=w;
+        file=f;
         r=new Random();
     }
     @Override
     public void run() {
         int i=0;
-        while(world.isAlive()){
             try { 
                 Thread.sleep(5000);
             } catch (Exception e) { 
                 System.out.println("err"); 
             }
-        Thread mono =new Thread(new Mono(world));
+        while(world.isAlive()&&world.isBeg()){
+        Thread mono =new Thread(new Mono(world,file));
         mono.start();
         i++;
         int wx,wy;
@@ -40,6 +43,11 @@ public class AutoPut implements Runnable {
                 }
                 while(world.get(wx, wy).getGlyph()!=(char)161);
                 world.put(new Sword(world), wx, wy);
+        }
+        try { 
+            Thread.sleep(5000);
+        } catch (Exception e) { 
+            System.out.println("err"); 
         }
         }        
         }
