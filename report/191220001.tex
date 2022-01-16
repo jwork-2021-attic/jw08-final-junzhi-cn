@@ -1,0 +1,220 @@
+%-----------------------------------------------------------------------
+% 中国科学: 信息科学 中文模板, 请用 CCT-LaTeX 编译
+% http://scis.scichina.com
+%-----------------------------------------------------------------------
+
+\documentclass{SCIS2022cn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% 作者附加的定义
+%%% 常用环境已经加载好, 不需要重复加载
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\standardtilde \let\standardtilde=\relax
+\usepackage{CJK}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage{listings}
+\usepackage{xcolor}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% 图片格式
+\renewcommand{\figurename}{图}
+%\renewcommand{\captionlabeldelim}{.~}
+\renewcommand{\thesubfigure}{(\roman{subfigure})}
+\makeatletter \renewcommand{\@thesubfigure}{\thesubfigure \space}
+\renewcommand{\p@subfigure}{} \makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% 代码格式
+\lstset{
+columns=fixed,
+numbers=left,                                        % 在左侧显示行号
+numberstyle=\tiny\color{gray},                       % 设定行号格式
+frame=none,                                          % 不显示背景边框
+breaklines=true,                                     % 代码过长则换行
+backgroundcolor=\color[RGB]{245,245,244},            % 设定背景颜色
+keywordstyle=\color[RGB]{40,40,255},                 % 设定关键字颜色
+numberstyle=\footnotesize\color{darkgray},
+commentstyle=\it\color[RGB]{0,96,96},                % 设置代码注释的格式
+stringstyle=\rmfamily\slshape\color[RGB]{128,0,0},   % 设置字符串格式
+showstringspaces=false,                              % 不显示字符串中的空格
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% 开始
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% 作者不需要修改此处信息
+\ArticleType{论文}
+%\SpecialTopic{}
+%\Luntan{中国科学院学部\quad 科学与技术前沿论坛}
+\Year{2022}
+\Vol{52}
+\No{1}
+\BeginPage{1}
+\DOI{}
+\ReceiveDate{}
+\ReviseDate{}
+\AcceptDate{}
+\OnlineDate{}
+\AuthorMark{}
+\AuthorCitation{}
+\enAuthorCitation{}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Developing a Java Game from Scratch}{Developing a Java Game from Scratch}
+
+\entitle{Developing a Java Game from Scratch}{Developing a Java Game from Scratch}
+
+\author[1]{毕一帆}{Yifan Bi1}{191220001@smail.nju.edu.cn}
+
+
+%若英文部分的emaillist太长需要换行的话,形式单独写在这里
+%\enauthoremaillist{xingming1@xxxx.xxx, xingming2@xxxx.xxx, xingming3@xxxx.xxx, xingming4\\@xxxx.xxx, xingming5@xxxx.xxx}
+
+%\comment{\dag~同等贡献}
+%\encomment{\dag~Equal contribution}
+
+\address[1]{南京大学, 南京 210023}{Nanjing University, Nanjing {\rm 210023}, Country}
+
+
+
+
+\abstract{Java的学习与使用是本课程的主要内容，而课程实验也为使用Java编写一个游戏。开发一个Java游戏使用到了很多技术，例如面向对象，多线程，文件IO 等等。游戏参考了2020年的年度最佳独立游戏Hades，是一个roguelike类游戏。.}
+
+\enabstract{An abstract (about 200 words) is a summary of the content of the manuscript. It should briefly describe the research purpose, method, result and conclusion. The extremely professional terms, special signals, figures, tables, chemical structural formula, and equations should be avoided here, and citation of reserences is not allowed.}
+
+\keywords{Java程序设计, 课程实验, 代码开发, 实验报告, 技术问题}
+\enkeywords{keyword1, keyword2, keyword3, keyword4, keyword5}
+
+\maketitle
+
+\section{开发目标}
+
+
+\subsection{游戏介绍}
+这个游戏是一个战斗类roguelike类游戏，参考了2020 年年度最佳独立游戏Hades，并试图实现了一些战斗形式与技能能力。游戏中存在不同种类的地块，有些能够使得玩家获得独特的能力或是提高玩家的属性，有些则十分危险，会使走上去的角色（不论是玩家还是怪物）受到伤害，而有些则可以隐藏其中的角色。如何充分利用这些方块决定了你能在这里生存多久。一些方块/能力参考了Hades中类似的方块。
+游戏全程使用键盘操控，提供存档功能。
+\subsubsection{玩法说明}
+
+游戏的开始界面如下图。
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.50\textwidth]{res/1.png}
+    \caption{开始界面}
+    \label{Pic.1}
+\end{figure}
+
+玩家使用上下键选择新游戏或继续游戏，使用空格键或回车键确认选择。其他的一些键盘操作指示同样也显示在开始界面上。选择游戏模式后，进入游戏界面，按Esc可回到开始界面，游戏界面如下图。
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.50\textwidth]{res/2.png}
+    \caption{游戏界面}
+    \label{Pic.2}
+\end{figure}
+
+死亡后结束界面如下图。
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.50\textwidth]{res/3.png}
+    \caption{结束界面}
+    \label{Pic.3}
+\end{figure}
+
+游戏界面中有不同的方块，不同方块功能不同。根据形状，可以把方块分为以下几类：草，怪物，盾，剑，地刺，地面，墙，玩家，攻击特效，玩家的另一个皮肤。如下图。
+\begin{figure}[H]
+    \centering
+    \subfigure[草]{
+    \label{pic.blk.1}
+    \includegraphics[width=0.05\textwidth]{res/4.png}}
+    \subfigure[怪物]{
+    \label{pic.blk.2}
+    \includegraphics[width=0.05\textwidth]{res/5.png}}
+    \subfigure[盾]{
+    \label{pic.blk.3}
+    \includegraphics[width=0.05\textwidth]{res/6.png}}
+    \subfigure[剑]{
+    \label{pic.blk.4}
+    \includegraphics[width=0.05\textwidth]{res/7.png}}
+    \subfigure[地刺]{
+    \label{pic.blk.5}
+    \includegraphics[width=0.05\textwidth]{res/8.png}}
+    \subfigure[地面]{
+    \label{pic.blk.6}
+    \includegraphics[width=0.05\textwidth]{res/9.png}}
+    \subfigure[墙]{
+    \label{pic.blk.7}
+    \includegraphics[width=0.05\textwidth]{res/10.png}}
+    \subfigure[玩家]{
+    \label{pic.blk.8}
+    \includegraphics[width=0.05\textwidth]{res/11.png}}
+    \subfigure[攻击特效]{
+    \label{pic.blk.9}
+    \includegraphics[width=0.05\textwidth]{res/12.png}}
+    \subfigure[玩家的另一个皮肤]{
+    \label{pic.blk.10}
+    \includegraphics[width=0.05\textwidth]{res/13.png}}
+    \caption{方块介绍}
+    \label{Pic.4}
+\end{figure}
+
+不同的方块有不同的效果。草：可以隐藏其中的角色，怪物或玩家走进这个方块时会被草遮住；怪物：敌对生物，靠近它会让玩家扣血；盾：走上该方块吃掉它后可以使用闪现，按空格键即可向前闪现一定格数，每吃一个会增加闪现格数，有上限；剑：走上该方块吃掉它后可以增加1单位攻击；地刺：走上它会扣血（无论是怪物还是玩家）；地面：无特殊效果；墙：阻挡角色，不可走上去；玩家：游戏者操控的角色；攻击特效：使用E攻击后出现的特效；玩家的另一个皮肤：可以使用Q来改变玩家形象，共五种不同形象轮流切换。怪物和物品会随着游戏时间进行而随机出现在地图上。
+玩家的攻击方式为按E使得周围四个敌人受到伤害，吃剑可以增加伤害，按方向键移动，每次一格，按空格键闪现，根据得到的盾的数量向移动方向闪现若干格，按Q改变玩家形象，靠近敌人或走上地刺会导致不同程度的扣血，当100点血归零时游戏结束。敌人死亡后会变成墙阻挡玩家移动，但可以使用闪现过墙。
+在灵感来源Hades中，同样有着地刺，闪现等概念。玩家使用的某种武器攻击方式也是对身边一圈敌人造成伤害。Hades中的相关物体如下。
+\begin{figure}[H]
+    \centering
+    \subfigure[地刺]{
+    \label{pic.hds.1}
+    \includegraphics[width=0.40\textwidth]{res/14.png}}
+    \subfigure[墙]{
+    \label{pic.hds.2}
+    \includegraphics[width=0.40\textwidth]{res/16.png}}
+    \subfigure[攻击特效]{
+    \label{pic.hds.3}
+    \includegraphics[width=0.40\textwidth]{res/15.png}}
+    \caption{Hades中的类似概念}
+    \label{Pic.5}
+\end{figure}
+
+\subsubsection{未来更新方向}
+目前游戏仅处在一个初级阶段，武器形式单一，怪物种类单一，物品种类较少，游戏目标不足。未来可根据玩家的不同形象更改武器种类，增加怪物死亡后掉落物，增加一些其他地图刷新的物品，增加计分等等。而怪物的各项属性可以根据颜色进行区分，也可增加一些Buff 例如让玩家免疫地刺伤害等等增加游戏趣味性。这也是Hades中比较吸引玩家的地方。怪物的攻击手段也可以增加，包括在Hades中出现的远程攻击巫师或是放炸弹的骷髅等等。也可参考Hades增加不同地区，根据地区更改地图，使游戏更加多变。代码的结构也有待优化，整体来说，还有很大的进步空间。
+
+\section{设计理念}
+\subsection{代码整体布局}
+代码分为几个部分，asciiPanel是图形化的相关代码，anish是具体物品交互逻辑，file用于存档，screen用于显示，runo主要是多线程相关代码，以及main用于启动。
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.50\textwidth]{res/code.png}
+    \caption{代码整体布局}
+    \label{Pic.6}
+\end{figure}
+
+\subsection{主要类介绍}
+main用于初始化相关设置；calabashbros中的类为各个物体，以及整个地图世界world；myfile是文件存档；worldscreen用于世界变化以及键盘事件；runo中，autoput负责定期放置怪物与物品，mono负责怪物逻辑，palyeratt负责完成攻击特效延迟消失。
+
+\subsection{设计的思路}
+本项目采用面向对象结构，每一种实体创建一个类进行描述与实现，各个类中存在继承关系。同时在不同的类之间，建立不同交互方式。在保存时，由于不同物品特性只由方块种类决定，因此只要将地图打印下来便可完成存档。而玩家属性则由另一个文件实现。而读档时只要加载地图，建立玩家与世界的联系，让每个怪物启动线程即可。
+
+\section{技术问题}
+\subsection{面向对象}
+由于本项目采用面向对象编程，因此需要为每个实体创建一个类，在类中实现其代码。但是由于实体间需要交互，而交互所需信息较多，因此在耦合性上效果并不那么好。例如世界的状态与玩家血量有关，因此在玩家血量变化时，就要判断是否要让世界结束。又或者在玩家或怪物移动时，根据不同的地块做出不同的逻辑，是否能移动，这些都是有待优化的问题。
+
+\subsection{并发编程}
+在本项目中，许多地方使用了并发编程。例如怪物，攻击特效，存档等，这些都需要独立进程去实现。为了避免冲突，我在世界放置物体和读取上加了锁，这样可以保障不会出现冲突，攻击的延迟不会造成怪物移动逻辑的bug。而为了避免攻击到怪物后怪物移动会导致与预期不符的情况，我让原本覆盖怪物的攻击特效改为了使怪物颜色发生变化，这样就可以让怪物移动更合理。同时，由于存档需要读取整个地图，因此我在存档时也加了锁，这样在存档时就不会出现怪物移动导致的bug了。
+
+\subsection{文件读写}
+游戏中存档是自动进行的，每当怪物移动，玩家操作，游戏都会进行存档。存档形式为一张地图和一个玩家属性文件，这样只要将地图打印下来便可完成存档。而读档时只要加载地图，建立玩家与世界的联系，让每个怪物启动线程即可。而为了避免几个怪物移动同时导致存档，我在存档的相关代码上也加了锁。同时为了避免在地图刷新时存档导致未加载完全的存档被保存，我使用了锁来保证存档时不会由于其他因素导致存档不完全。
+
+\section{工程问题}
+在编写代码前，思考一个完整的代码体系可以帮助我们更有效减少编写代码中出现问题。在写代码前，先思考，这个如何实现，会不会有什么冲突，应该如何解决，这样可以避免写完代码运行后发现bug，然后再进行修改，可以节省很多时间。一个良好的架构和良好的编程习惯可以帮助我们更好的debug，在修改代码时也可以更加节约时间。低耦合性可以避免很多问题，但如何编写一个具有低耦合性的代码是一个比较大的问题，在这方面我还有待提高。
+
+\section{课程感言}
+Java这门课程将理论与实践相结合，在完成课程实验的过程中，让我对Java的理解更加深刻了。自主开发一个游戏确实能够帮助我们更好地理解面向对象和Java的相关概念，而并发编程之中的许多问题也只有真正上手了才知道会出现什么，如何解决。同时，在开发项目中许多问题与新知识需要自行搜索资料学习与解决，这对我们整个生涯都是十分有益的。等真正做完一个游戏后，许多道理才真正得以体会。一些先前了解的知识也在实践中消化，知道了“为什么”。这门课是真正能学到知识的，可以说是一门不折不扣的好课。在学习过程中，我也发现了自己的许多问题，例如拖延症，代码习惯等等。这些都是我需要去改进的地方。曹老师确实可以称得上是一位好老师！
+
+
+\end{document}
